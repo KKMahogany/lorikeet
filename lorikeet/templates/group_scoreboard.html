@@ -1,0 +1,101 @@
+{# Number of sets in each scoreboard block. #}
+{% set SETS_IN_BLOCK = 3 %}
+
+{% extends "layout.html" %}
+
+{% block title %}
+{{ group.title }}
+{% endblock %}
+
+{% block body %}
+<h1>{{ group.title }}</h1>
+
+<h3>Scoreboard | <a href="{{ url_for('group_subs', groupname=group.name) }}">Recent Submissions</a></h3>
+
+{% for z in range(0, group.sets|length, SETS_IN_BLOCK) %}
+<table class="scoreboard">
+    <thead>
+        <tr>
+            <th colspan="14"></th>
+            {% for user in group.users %}
+            <th class="username" colspan="3">
+                <div>
+                    <a href="{{ url_for('user_page', username=user.username) }}"
+                        class="scoreboard_link">
+                        {{ user.firstname }} {{ user.lastname|first }}
+                    </a>
+                </div>
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for set in group.sets[z:z+SETS_IN_BLOCK] %}
+        <tr class="set_row scoreboard_row">
+            {% set i = z + loop.index0 %}
+            <td class="set_title scoreboard_title" colspan="14">
+                <a href="{{ url_for('group_set', groupname=group.name, setname=set.name) }}"
+                    class="scoreboard_link">
+                    {{ set.title }}
+                </a>
+            </td>
+            {% for user in group.users %}
+                {% set j = loop.index0 %}
+                {% if group.marks[i][j].mark is not none %}
+                <td class="score {{ group.marks[i][j].mark|mark_color_class }}"
+                    title="{{ user.firstname }} {{ user.lastname }}, {{ set.title }}: {{ group.marks[i][j].mark }}"
+                    colspan="3">
+                    <div>
+                        <a href="{{ url_for('user_set_page', 
+                            username=user.username,
+                            setname=set.name) }}"
+                            class="scoreboard_link">
+                            {{ group.marks[i][j].mark }}
+                        </a>
+                    </div>
+                </td>
+                {% else %}
+                <td class="score {{ group.marks[i][j].mark|mark_color_class }}"
+                    title="{{ user.firstname }} {{ user.lastname }}, {{ set.title }}: No attempts"
+                    colspan="3"></td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% for problem in set.problems %}
+        <tr class="problem_row scoreboard_row">
+            {% set j = loop.index0 %}
+            <td class="problem_title scoreboard_title" colspan="14">
+                <a href="{{ url_for('group_problem', groupname=group.name, problemname=problem.name) }}"
+                    class="scoreboard_link">
+                    {{ problem.title }}
+                </a>
+            </td>
+            {% for user in group.users %}
+            {% set k = loop.index0 %}
+            {% if group.marks[i][k].subs[j].mark is not none %}
+            <td class="score {{ group.marks[i][k].subs[j].mark|mark_color_class }}"
+                title="{{ user.firstname }} {{ user.lastname }}, {{ problem.title }}: {{ group.marks[i][k].subs[j].mark }}"
+                colspan="3">
+                <div>
+                    <a href="{{ url_for('user_problem',
+                        username=user.username,
+                        problemname=problem.name) }}"
+                        class="scoreboard_link">
+                    {{ group.marks[i][k].subs[j].mark }}
+                    </a>
+                </div>
+            </td>
+            {% else %}
+            <td class="score {{ group.marks[i][k].subs[j].mark|mark_color_class }}"
+                title="{{ user.firstname }} {{ user.lastname }}, {{ problem.title }}: No attempts"
+                colspan="3"></td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+{% endblock %}

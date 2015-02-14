@@ -1,0 +1,39 @@
+{# TODO(junkbot): Make macros for url links #}
+{% from "recent_subs_table.html" import recent_subs_table %}
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Lorikeet - {% block title %}{% endblock %}</title>
+        <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" />
+        <link href="{{ url_for('static', filename='prism.css') }}" rel="stylesheet" />
+    </head>
+
+    <body>
+        <div>
+            <b>Lorikeet</b>
+            <a href="{{ url_for('index') }}">[Home]</a>
+            <b>Groups</b>
+            <a href="{{ url_for('group_scoreboard', groupname='dec14alpha') }}">
+                [dec14alpha]</a>
+            <a href="{{ url_for('group_scoreboard', groupname='dec14beta') }}">
+                [dec14beta]</a>
+            <div id="search_div">
+                <b>Search</b>
+                <form id="search_form" action="{{ url_for('search_handle') }}" method="GET">
+                    <input type="text" name="query" accesskey="z"
+                    title="[alt-z] to focus" />
+                    <input type="submit" value="Users" name="users" />
+                    <input type="submit" value="Problems" name="problems" />
+                </form>
+            </div>
+        </div>
+        <hr>
+        {% block body %}
+        {% endblock %}
+
+        <script src="{{ url_for('static', filename='prism.js') }}"></script>
+    </body>
+</html>

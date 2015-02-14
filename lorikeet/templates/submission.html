@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block title %}
+{{ sub.user.firstname }} {{ sub.user.lastname }}'s Attempt #{{ sub.attempt }} at {{ sub.problem.title }}
+{% endblock %}
+
+{% block body %}
+<table class="sub_data">
+    <tr class="sub_data_row">
+        <td>User</td>
+        <td>
+            <a href="{{ url_for('user_page', username=sub.user.username) }}">{{
+            sub.user.username }}</a>
+        </td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>Name</td>
+        <td>{{ sub.user.firstname }} {{ sub.user.lastname }}</td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>Problem Title</td>
+        <td>
+            <a href="/cgi-bin/train/problem.pl?problemid={{ sub.problem.problemid }}">
+                {{ sub.problem.title }}</a>
+        </td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>Problem Name</td>
+        <td>
+            <a href="{{ url_for('problem_page', problemname=sub.problem.name) }}">
+                {{ sub.problem.name }}</a>
+        </td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>Attempt</td>
+        <td>
+            {% if sub.attempt > 1 %}
+            <a href="{{ url_for('user_problem_attempt',
+                username=sub.user.username,
+                problem=sub.problem.name,
+                attempt=sub.attempt-1) }}">[-]</a>
+            {% else %}
+            [-]
+            {% endif %}
+
+            {{ sub.attempt }} of {{ sub.num_attempts }}
+
+            {% if sub.attempt < sub.num_attempts %}
+            <a href="{{ url_for('user_problem_attempt',
+                username=sub.user.username,
+                problem=sub.problem.name,
+                attempt=sub.attempt+1) }}">[+]</a>
+            {% else %}
+            [+]
+            {% endif %}
+
+            <a href="{{ url_for('user_problem',
+                username=sub.user.username,
+                problemname=sub.problem.name) }}">[all]</a>
+        </td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>Language</td>
+        <td>{{ sub.lang }}</td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>Score</td>
+        <td class="score {{ sub.mark|mark_color_class }}">{{ sub.mark }}</td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>Timestamp</td>
+        <td>{{ sub.timestamp }}</td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>Train Extract</td>
+        <td><tt>train-extract {{ sub.user.username }} {{ sub.problem.name }} {{ sub.attempt }}</tt></td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>Judge Informal</td>
+        <td><tt>judge informal /usr/local/train/problems/{{ sub.problem.name }}</tt></td>
+    </tr>
+    <tr class="sub_data_row">
+        <td>View</td>
+        <td>
+            <a href="#judge">[Judge]</a>
+            {% if sub.langid == 'zip' %}
+            <a href="{{ url_for('user_problem_attempt_extract',
+                username=sub.user.username,
+                problem=sub.problem.name,
+                attempt=sub.attempt) }}">[Download Zip]</a>
+            {% else %}
+            <a href="#source">[Code]</a>
+            <a href="{{ url_for('user_problem_attempt_extract',
+                username=sub.user.username,
+                problem=sub.problem.name,
+                attempt=sub.attempt) }}">[Download Code]</a>
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<a id="judge"></a>
+<pre>{{ sub.judge }}</pre>
+
+{% if sub.langid != 'zip' %}
+<a id="source"></a>
+<pre class="line-numbers"><code class="language-{{ sub.lang|prism_lang_map }}">{{ sub.source }}</code></pre>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,202 @@
+/* Body Font */
+body {
+    font-family: sans-serif;
+    font-size: 1em;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    line-height: 1.5em;
+}
+
+/* Max width for code/judge output */
+pre, code {
+    font-family: monospace;
+    max-width: 800px;
+    line-height: normal;
+}
+
+/* Never show selected links */
+a:visited {
+    color: blue;
+}
+
+/* Search box */
+#search_div {
+    float: right;
+}
+
+#search_form {
+    display: inline;
+}
+
+/* Search results */
+.public_status {
+    text-align: center;
+}
+
+.search_non_public {
+    background-color: #D95700;
+}
+
+.search_public {
+    background-color: #4E9A05;
+}
+
+.search_user_row:nth-of-type(even) {
+    background-color: #ECECEF;
+}
+
+.search_set_row:nth-of-type(even) {
+    background-color: #ECECEF;
+}
+
+.search_problem_row {
+    background-color: #DDDDDD;
+}
+
+table.search_results * td {
+    border-radius: 3px;
+}
+
+/* Scoreboard */
+.scoreboard {
+    table-layout: fixed;
+    width: 100%;
+}
+
+a.scoreboard_link {
+    width: 100%;
+    height: 100%;
+    display: block;
+    color: inherit;
+    text-decoration: inherit;
+}
+
+/* Rotated Table Headers */
+th.username {
+    white-space: nowrap;
+    -webkit-transform-origin: 50px 60px;
+    -moz-transform-origin: 50px 60px;
+    -o-transform-origin: 50px 60px;
+    -ms-transform-origin: 50px 60px;
+    transform-origin: 50px 60px;
+    
+    -webkit-transform: rotate(300deg);  
+    -moz-transform: rotate(300deg);
+    -ms-transform: rotate(300deg);
+    -o-transform: rotate(300deg);
+    transform: rotate(300deg); 
+    height: 105px; /* to be adjusted: column is not always tall enough for text */
+    text-align: center;
+}
+
+/* Score colors and highlights [mostly stolen from CMS] */
+tr.scoreboard_row, td.score {
+    opacity: 0.85;
+}
+
+td.scoreboard_title {
+    opacity: 1;
+}
+
+tr.scoreboard_row:hover, td.score:hover {
+    opacity: 1;
+}
+
+tr.scoreboard_row:hover td.scoreboard_title {
+    background-color: rgba(200,200,200,0.35);
+}
+
+td.score {
+    text-align: center;
+    border-radius: 3px;
+}
+
+td.scoreboard_title {
+    border-radius: 3px;
+}
+
+td.set_title {
+    background-color: #DDDDDD;
+}
+
+table.sub_data * td {
+    border-radius: 3px;
+}
+
+table.sub_data * .score {
+    text-align: center;
+}
+
+table.sub_data * .attempt {
+    text-align: center;
+}
+
+table.sub_data > tr {
+    opacity: 0.85;
+}
+
+.recent_subs_row {
+    opacity: 0.85;
+}
+
+.recent_subs_row:hover {
+    opacity: 1;
+}
+
+.sub_data_row:nth-of-type(odd) {
+    background-color: #ECECEF;
+}
+
+.score_no_attempt {
+    background-color: #ECECEF;
+}
+
+.score_0 {
+    background-color: #F40000;
+}
+
+.score_0_10 {
+    background-color: #EB1D00;
+}
+
+.score_10_20 {
+    background-color: #E23A00;
+}
+
+.score_20_30 {
+    background-color: #D95700;
+}
+
+.score_30_40 {
+    background-color: #D17400;
+}
+
+.score_40_50 {
+    background-color: #C89100;
+}
+
+.score_50_60 {
+    background-color: #B99F00;
+}
+
+.score_60_70 {
+    background-color: #A39E01;
+}
+
+.score_70_80 {
+    background-color: #8E9D02;
+}
+
+.score_80_90 {
+    background-color: #789C03;
+}
+
+.score_90_100 {
+    background-color: #639B04;
+}
+
+.score_100 {
+    background-color: #4E9A05;
+}
+

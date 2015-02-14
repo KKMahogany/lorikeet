@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Submissions by Group {{ group.title }}
+{% endblock %}
+
+{% block body %}
+<h1>Submissions by Group {{ group.title }}</h1>
+
+<h3><a href="{{ url_for('group_scoreboard', groupname=group.name) }}">Scoreboard</a> | Recent Submissions</h3>
+
+{{ recent_subs_table(subs) }}
+
+{% endblock %}

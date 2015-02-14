@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Search Results
+{% endblock %}
+
+{% block body %}
+<h1>Search Results</h1>
+Results for query <tt>{{ query }}</tt>.
+
+<h2>Users</h2>
+<table>
+    <tr>
+        <th>Username</th>
+        <th>Name</th>
+        <th>Year</th>
+        <th>School</th>
+        <th>State</th>
+        <th>Country</th>
+    </tr>
+    {% for res in users_res %}
+    <tr class="search_user_row">
+        <td>
+            <a href="{{ url_for('user_page', username=res.username) }}">
+                {{ res.username }}
+            </a>
+        </td>
+        <td>{{ res.firstname }} {{ res.lastname }}</td>
+        <td>{{ res.year|title }}</td>
+        <td>{{ res.school }}</td>
+        <td>
+            {% if res.state != 'none' %}
+            {{ res.state|upper }}
+            {% endif %}
+        </td>
+        <td>
+            {% if res.country != 'none' %}
+            {{ res.country|upper }}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

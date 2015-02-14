@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Submissions by {{ user.firstname }} {{ user.lastname }} for Problem {{ problem.title }}
+{% endblock %}
+
+{% block body %}
+<h1>
+    {{ user.firstname }} {{ user.lastname }}
+    (<a href="{{ url_for('user_page', username=user.username) }}">{{ user.username }}</a>)
+</h1>
+
+<h3>
+    Recent Submissions for
+    <a href="/cgi-bin/train/problem.pl?problemid={{ problem.problemid }}">
+        {{ problem.title }}</a>
+    (<a href="{{ url_for('problem_page', problemname=problem.name) }}">{{ problem.name }}</a>)
+</h3>
+
+{{ recent_subs_table(subs, ['name', 'username', 'problemtitle', 'problemname', 'num_attempts']) }}
+
+{% endblock %}

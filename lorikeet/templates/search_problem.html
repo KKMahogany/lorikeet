@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Search Results
+{% endblock %}
+
+{% block body %}
+<h1>Search Results</h1>
+
+<div>
+    Results for query <tt>{{ query }}</tt>.
+</div>
+
+<div>
+    <a href="#sets">[Sets]</a>
+    <a href="#problems">[Problems]</a>
+</div>
+
+<a id="sets"></a>
+<h2>Sets</h2>
+{% if sets_res %}
+<table class="search_results">
+    <tr>
+        <th>Name</th>
+        <th>Title</th>
+        <th>Public</th>
+    </tr>
+
+    {% for set in sets_res %}
+    <tr class="search_set_row">
+        <td>
+            <a href="{{ url_for('set_page', setname=set.name) }}">{{ set.name }}</a>
+        </td>
+        <td>
+            <a href="/cgi-bin/train/hub.pl?expand={{ set.name }}#{{ set.name }}">{{ set.title }}</a>
+        </td>
+        {% if set.public %}
+        <td class="public_status search_public">Public</td>
+        {% else %}
+        <td class="public_status search_non_public">Private</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+No matching sets found.
+{% endif %}
+
+<a id="problems"></a>
+<h2>Problems</h2>
+{% if problems_res %}
+<table class="search_results">
+    <tr>
+        <th>Name</th>
+        <th>Title</th>
+        <th>Public</th>
+    </tr>
+
+    {% for res in problems_res %}
+    <tr class="search_problem_row">
+        <td class="problem_name">
+            <a href="{{ url_for('problem_page', problemname=res.problem.name) }}">
+                {{ res.problem.name }}
+            </a>
+        </td>
+        <td class="problem_title">
+            <a href="/cgi-bin/train/problem.pl?problemid={{ res.problem.problemid }}">
+                {{ res.problem.title }}
+            </a>
+        </td>
+        {% if res.sets|map(attribute='public')|any %}
+        <td class="public_status search_public">Public</td>
+        {% else %}
+        <td class="public_status search_non_public">Private</td>
+        {% endif %}
+    </tr>
+
+    {% for set in res.sets %}
+    <tr>
+        <td>
+            <a href="{{ url_for('set_page', setname=set.name) }}">{{ set.name }}</a>
+        </td>
+        <td>
+            <a href="/cgi-bin/train/hub.pl?expand={{ set.name }}#{{ set.name }}">{{ set.title }}</a>
+        </td>
+        {% if set.public %}
+        <td class="public_status search_public">Public</td>
+        {% else %}
+        <td class="public_status search_non_public">Private</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+    {% endfor %}
+</table>
+{% else %}
+No matching problems found.
+{% endif %}
+
+{% endblock %}

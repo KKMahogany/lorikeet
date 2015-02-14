@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Submissions by Group {{ group.title }} for Set {{ sett.title }}
+{% endblock %}
+
+{% block body %}
+<h1>Submissions by Group {{ group.title }} for Set {{ sett.title }}</h1>
+
+<h3>
+    Recent Submissions for
+    <a href="/cgi-bin/train/hub.pl?expand={{ sett.name }}#{{ sett.name }}">
+        {{ sett.title }}</a>
+    (<a href="{{ url_for('set_page', setname=sett.name) }}">{{ sett.name }}</a>)
+</h3>
+
+{{ recent_subs_table(subs) }}
+
+{% endblock %}

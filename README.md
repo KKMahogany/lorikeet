@@ -1,2 +1,2 @@
-# lorikeet
+# Lorikeet
 Submission tracker for orac.

@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block title %}Submissions for {{ problem.title }}{% endblock %}
+
+{% block body %}
+<h1>
+    <a href="/cgi-bin/train/problem.pl?problemid={{ problem.problemid }}">
+        {{ problem.title }}</a> ({{ problem.name }})
+</h1>
+
+<h2>Recent Submissions</h2>
+
+{{ recent_subs_table(subs, ['problemtitle', 'problemname']) }}
+
+{% endblock %}

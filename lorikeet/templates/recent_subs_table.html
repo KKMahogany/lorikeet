@@ -1,0 +1,87 @@
+{% macro recent_subs_table(subs=[], hidden_fields=[]) %}
+<div>Displaying {{ subs|length }} submissions.</div>
+
+<table class="sub_data">
+    <thead>
+        <tr>
+            {% if 'name' not in hidden_fields %}
+            <th>Name</th>
+            {% endif %}
+
+            {% if 'username' not in hidden_fields %}
+            <th>Username</th>
+            {% endif %}
+
+            {% if 'problemtitle' not in hidden_fields %}
+            <th>Problem Title</th>
+            {% endif %}
+
+            {% if 'problemname' not in hidden_fields %}
+            <th>Problem Name</th>
+            {% endif %}
+
+            {% if 'attempts' not in hidden_fields %}
+            <th>Attempt</th>
+            {% endif %}
+
+            {% if 'mark' not in hidden_fields %}
+            <th>Score</th>
+            {% endif %}
+
+            {% if 'timestamp' not in hidden_fields %}
+            <th>Timestamp</th>
+            {% endif %}
+        </tr>
+    </thead>
+
+    {% for sub in subs %}
+    <tr class="sub_data_row recent_subs_row">
+        {% if 'name' not in hidden_fields %}
+        <td>{{ sub.user.firstname }} {{ sub.user.lastname }}</td>
+        {% endif %}
+
+        {% if 'username' not in hidden_fields %}
+        <td>
+            <a href="{{ url_for('user_page', username=sub.user.username) }}">{{ sub.user.username }}</a>
+        </td>
+        {% endif %}
+
+        {% if 'problemtitle' not in hidden_fields %}
+        <td>
+            <a href="/cgi-bin/train/problem.pl?problemid={{ sub.problem.problemid }}">
+                {{ sub.problem.title|string }}</a>
+        </td>
+        {% endif %}
+
+        {% if 'problemname' not in hidden_fields %}
+        <td>
+            <a href="{{ url_for('problem_page', problemname=sub.problem.name) }}">{{ sub.problem.name }}</a>
+        </td>
+        {% endif %}
+
+        {% if 'attempts' not in hidden_fields %}
+        <td class="attempt">
+            <a href="{{ url_for('user_problem_attempt',
+                username=sub.user.username,
+                problem=sub.problem.name,
+                attempt=sub.attempt) }}">{{ sub.attempt }}</a>
+        {% if 'num_attempts' not in hidden_fields %}
+            of
+            <a href="{{ url_for('user_problem',
+                username=sub.user.username,
+                problemname=sub.problem.name) }}">{{ sub.num_attempts }}</a>
+        {% endif %}
+        </td>
+        {% endif %}
+
+        {% if 'mark' not in hidden_fields %}
+        <td class="score {{ sub.mark|mark_color_class }}">{{ sub.mark }}</td>
+        {% endif %}
+
+        {% if 'timestamp' not in hidden_fields %}
+        <td>{{ sub.timestamp }}</td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+{% endmacro %}

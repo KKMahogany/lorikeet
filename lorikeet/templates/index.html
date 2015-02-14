@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Orac Submission Tracker
+{% endblock %}
+
+{% block body %}
+<h1>Lorikeet - Orac Submission Tracker</h1>
+
+<h2>Recent Submissions</h2>
+
+{{ recent_subs_table(subs) }}
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Submission by {{ user.firstname }} {{ user.lastname }} ({{ user.username }})
+{% endblock %}
+
+{% block body %}
+<h1>{{ user.firstname }} {{ user.lastname }} ({{ user.username }})</h1>
+<h3>
+    {% if user.year == 'uni' %}
+    At university from {{ user.state|upper }}, {{ user.country|upper }}.
+    {% elif user.year == 'primary' %}
+    Primary student at {{ user.school }}, {{ user.state|upper }}, {{ user.country|upper }}.
+    {% elif user.year == 'none' %}
+    From {{ user.state|upper }}, {{ user.country|upper }}.
+    {% else %}
+    Year {{ user.year }} at {{ user.school }}, {{ user.state|upper }}, {{ user.country|upper }}.
+    {% endif %}
+</h3>
+
+<h2>Recent Submissions</h2>
+
+{{ recent_subs_table(subs, ['name', 'username']) }}
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Submissions for Set {{ sett.title }}
+{% endblock %}
+
+{% block body %}
+<h1>
+    <a href="/cgi-bin/train/hub.pl?expand={{ sett.name }}#{{ sett.name }}">
+        {{ sett.title }}</a>
+    ({{ sett.name }})
+    {% if sett.public %}
+    [Public]
+    {% endif %}
+</h1>
+
+<h3>
+    Recent Submissions
+</h3>
+
+{{ recent_subs_table(subs, []) }}
+
+{% endblock %}
