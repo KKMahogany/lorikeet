@@ -12,14 +12,21 @@
     </head>
 
     <body>
-        <div>
-            <b>Lorikeet</b>
-            <a href="{{ url_for('index') }}">[Home]</a>
-            <b>Groups</b>
-            <a href="{{ url_for('group_scoreboard', groupname='dec14alpha') }}">
-                [dec14alpha]</a>
-            <a href="{{ url_for('group_scoreboard', groupname='dec14beta') }}">
-                [dec14beta]</a>
+        <div id="head_bar">
+            <div id="header_left">
+                <b>Lorikeet</b>
+                <a href="{{ url_for('index') }}">[Home]</a>
+                <a href="http://orac.amt.edu.au/cgi-bin/train/hub.pl">[Orac]</a>
+                <b>Groups</b>
+                <a href="{{ url_for('group_scoreboard', groupname='ioi15') }}">
+                    [ioi15]</a>
+                <a href="{{ url_for('group_scoreboard', groupname='apr15') }}">
+                    [apr15]</a>
+                <a href="{{ url_for('group_scoreboard', groupname='dec15alpha') }}">
+                    [dec15alpha]</a>
+                <a href="{{ url_for('group_scoreboard', groupname='dec15beta') }}">
+                    [dec15beta]</a>
+            </div>
             <div id="search_div">
                 <b>Search</b>
                 <form id="search_form" action="{{ url_for('search_handle') }}" method="GET">
