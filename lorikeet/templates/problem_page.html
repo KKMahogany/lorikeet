@@ -1,3 +1,4 @@
+{% from "stats_table.html" import stats_table %}
 {% extends "layout.html" %}
 
 {% block title %}Submissions for {{ problem.title }}{% endblock %}
@@ -7,6 +8,8 @@
     <a href="/cgi-bin/train/problem.pl?problemid={{ problem.problemid }}">
         {{ problem.title }}</a> ({{ problem.name }})
 </h1>
+
+{{ stats_table(stats) }}
 
 <h2>Recent Submissions</h2>
 

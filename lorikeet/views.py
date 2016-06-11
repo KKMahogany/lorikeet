@@ -11,12 +11,13 @@
 
 from lorikeet import app
 from flask import render_template, url_for, make_response, request, redirect
-
 import groups
 
 import psycopg2
 import base64
 import time
+
+from collections import OrderedDict
 
 _DATABASE_NAME = 'train'
 _HARD_LIMIT = 100
@@ -478,6 +479,54 @@ def problem_search_query(substr):
     conn.close()
     return ret
 
+# Gets stats for a given problem to display on the problem's page
+def problem_stats(problemid=-1):
+    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    cur = conn.cursor()
+    stats = OrderedDict()
+
+    # Total number of competitors who scored 100
+    query = ('SELECT DISTINCT count(competitorid) '
+             'FROM submissions '
+             'WHERE problemid = %(problemid)s AND mark = 100;') % {'problemid': problemid}
+    cur.execute(query)
+    total_solves = cur.fetchone()[0]
+    stats["Total Solves"] = total_solves
+
+    # Total Submissions
+    query = ('SELECT count(*) '
+             'FROM submissions '
+             'WHERE problemid = %(problemid)s;') % {'problemid': problemid}
+    cur.execute(query)
+    stats["Total Submissions"] = cur.fetchone()[0]
+
+    # Average Submissions for people who solve the problem
+    if total_solves == 0:
+        stats["Average submissions per solve"] = "N/A"
+    else:
+        query = ('''SELECT count(t1.competitorid)
+                    FROM submissions as t1
+                    JOIN (
+                        SELECT DISTINCT competitorid
+                        FROM progress
+                        WHERE problemid = %(problemid)s AND bestscore = 100
+                    ) as t2
+                    ON t1.competitorid = t2.competitorid
+                    WHERE t1.problemid = %(problemid)s;''') % {'problemid': problemid}
+        cur.execute(query)
+        stats["Average submissions per solve"] = cur.fetchone()[0]/total_solves
+
+    # How many people have viewed to the problem
+    query = ('SELECT DISTINCT count(competitorid) '
+             'FROM progress '
+             'WHERE problemid = %(problemid)s;') % {'problemid': problemid}
+    cur.execute(query)
+    stats["Total users who've viewed this problem"] = cur.fetchone()[0]
+    # Close database connection.
+    cur.close()
+    conn.close()
+    return stats
+
 # Given a search string, looks for all sets that contain that substring in name
 # or title.
 def set_search_query(substr):
@@ -541,8 +590,13 @@ def user_page(username):
 def problem_page(problemname):
     problem = get_problem(problemname=problemname)
     if problem:
+        # Get submissions
         subs = filter_submissions(problems=[problemname])
-        return render_template('problem_page.html', problem=problem, subs=subs)
+
+        # Get problem stats
+        stats = problem_stats(problem.problemid)
+
+        return render_template('problem_page.html', problem=problem, subs=subs, stats=stats)
     else:
         return 'Problem does not exist'
 

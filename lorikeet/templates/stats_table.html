@@ -1,0 +1,15 @@
+{% macro stats_table(stats) %}
+
+<table class="stats">
+    {% for key, value in stats.iteritems() %}
+    <tr class="sub_data_row recent_subs_row">
+        <td>
+            {{ key }}
+        </td>
+        <td>
+            {{ value }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endmacro %}
