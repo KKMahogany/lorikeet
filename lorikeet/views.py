@@ -497,6 +497,9 @@ def problem_search_query(substr):
     return ret
 
 # Gets some general stats for a given problem to display on the problem's page
+# Returns a mapping from a stat's display name to a tuple containing the 
+# values for that stat. A stat can have multiple values e.g. if we are
+# looking at the stat over different time periods
 def problem_stats(problemid):
     conn = get_db()
     cur = conn.cursor()
@@ -531,7 +534,8 @@ def problem_stats(problemid):
                     ON t1.competitorid = t2.competitorid
                     WHERE t1.problemid = %s;''')
         cur.execute(query, (problemid, problemid, ))
-        stats["Average submissions per solve"] = (cur.fetchone()[0]/total_solves, )
+        stats["Average submissions per solve"] = (cur.fetchone()[0]/
+                                                  total_solves, )
 
     # How many people have viewed to the problem
     query = ('SELECT DISTINCT count(competitorid) '
