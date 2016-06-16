@@ -566,9 +566,7 @@ def recent_solves(userid, max_solves=10):
     for s in solves:
         subs.append(Submission(problem=get_problem(s[0]), 
                                timestamp=s[1],
-                               user=get_user(userid=userid)
-                              )
-                   )
+                               user=get_user(userid=userid)))
     return subs
 
 # Given a search string, looks for all sets that contain that substring in name
@@ -645,13 +643,11 @@ def problem_page(problemname):
         # Get problem stats
         stats = problem_stats(problem.problemid)
 
-        return render_template(
-                               'problem_page.html', 
+        return render_template('problem_page.html', 
                                problem=problem, 
                                subs=subs, 
                                stats=stats.values(),
-                               row_header=stats.keys()
-                              )
+                               row_header=stats.keys())
     else:
         return 'Problem does not exist'
 
