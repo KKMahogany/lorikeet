@@ -17,8 +17,6 @@ import psycopg2
 import base64
 import time
 
-from collections import OrderedDict
-
 _DATABASE_NAME = 'train'
 _HARD_LIMIT = 100
 
@@ -503,7 +501,7 @@ def problem_search_query(substr):
 def problem_stats(problemid):
     conn = get_db()
     cur = conn.cursor()
-    stats = OrderedDict()
+    stats = {}
 
     # Total number of competitors who scored 100
     query = ('SELECT DISTINCT count(competitorid) '

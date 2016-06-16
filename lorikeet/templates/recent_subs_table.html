@@ -20,7 +20,7 @@
             <th>Problem Name</th>
             {% endif %}
 
-            {% if 'attempts' not in hidden_fields and 'num_attempts' not in hidden_fields %}
+            {% if 'attempts' not in hidden_fields %}
             <th>Attempt</th>
             {% endif %}
             {% if 'attempts' in hidden_fields and 'num_attempts' not in hidden_fields %}
@@ -62,7 +62,7 @@
         </td>
         {% endif %}
 
-        {% if 'attempts' not in hidden_fields or 'num_attempts' not in hidden_fields%}
+        {% if 'attempts' not in hidden_fields or 'num_attempts' not in hidden_fields %}
         <td class="attempt">
         {% if 'attempts' not in hidden_fields %}
             <a href="{{ url_for('user_problem_attempt',
@@ -70,7 +70,7 @@
                 problem=sub.problem.name,
                 attempt=sub.attempt) }}">{{ sub.attempt }}</a>
         {% endif %}
-        {% if 'attempts' not in hidden_fields and 'num_attempts' not in hidden_fields%}
+        {% if 'attempts' not in hidden_fields and 'num_attempts' not in hidden_fields %}
             of
         {% endif %}
         {% if 'num_attempts' not in hidden_fields %}
