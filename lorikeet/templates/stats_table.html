@@ -1,14 +1,30 @@
-{% macro stats_table(stats) %}
+{% macro stats_table(stats, col_header=None, row_header=None) %}
 
 <table class="stats">
-    {% for key, value in stats.iteritems() %}
+    {% if col_header %}
+    <thead>
+        <tr>
+            {% if row_header %}
+            <th></th>
+            {% endif %}
+            {% for h in col_header %}
+            <th>h</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    {% endif %}
+    {% for s in stats %}
     <tr class="sub_data_row recent_subs_row">
+        {% if row_header %}
+        <th>
+            {{ row_header[loop.index0] }}
+        </th>
+        {% endif %}
+        {% for v in s %}
         <td>
-            {{ key }}
+            {{ v }}
         </td>
-        <td>
-            {{ value }}
-        </td>
+        {% endfor %}
     </tr>
     {% endfor %}
 </table>

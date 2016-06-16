@@ -18,6 +18,9 @@ Submission by {{ user.firstname }} {{ user.lastname }} ({{ user.username }})
     {% endif %}
 </h3>
 
+<h2>Recent Solves</h2>
+{{ recent_subs_table(solves, ['name', 'username', 'mark', 'attempts']) }}
+
 <h2>Recent Submissions</h2>
 
 {{ recent_subs_table(subs, ['name', 'username']) }}

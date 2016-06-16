@@ -10,7 +10,7 @@
 # TODO(junkbot): Fix unicode issues.
 
 from lorikeet import app
-from flask import render_template, url_for, make_response, request, redirect
+from flask import render_template, url_for, make_response, request, redirect, g
 import groups
 
 import psycopg2
@@ -21,6 +21,23 @@ from collections import OrderedDict
 
 _DATABASE_NAME = 'train'
 _HARD_LIMIT = 100
+
+# Connect to database
+def connect_db():
+    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    return conn
+
+# Return connection to database
+def get_db():
+    if not hasattr(g, 'psql_db'):
+        g.psql_db = connect_db()
+    return g.psql_db
+
+# Close the database after each request
+@app.teardown_appcontext
+def close_db(error):
+    if hasattr(g, 'psql_db'):
+        g.psql_db.close()
 
 # Information about a user that we might actually care about
 class User(object):
@@ -132,7 +149,7 @@ class GroupMarks(Group):
 # TODO(junkbot): Optimise this function's PSQL queries.
 def filter_submissions(users=None, sets=None, problems=None):
     # Connect to database.
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    conn = get_db()
     cur = conn.cursor()
 
     # Shorthand for getting the first element in a tuple
@@ -218,7 +235,7 @@ def filter_submissions(users=None, sets=None, problems=None):
 
     # Close database connection.
     cur.close()
-    conn.close()
+    
 
     return results
 
@@ -231,7 +248,7 @@ def get_group_scores(group=None):
 
     if group:
         # Connect to database.
-        conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+        conn = get_db()
         cur = conn.cursor()
 
         ret = [] 
@@ -281,7 +298,7 @@ def get_group_scores(group=None):
 
         # Close database connection.
         cur.close()
-        conn.close()
+        
 
         return ret
     else:
@@ -291,7 +308,7 @@ def get_group_scores(group=None):
 # exist. If both are given, only competitorid is used.
 def get_user(userid=None, username=None):
     # Connect to database.
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    conn = get_db()
     cur = conn.cursor()
 
     if userid or username:
@@ -312,14 +329,14 @@ def get_user(userid=None, username=None):
 
     # Close database connection.
     cur.close()
-    conn.close()
+    
     return ret
 
 # Returns a Problem object based on problemid or problemname or None if problem
 # doesn't exist. If both are given, only problemid is used.
 def get_problem(problemid=None, problemname=None):
     # Connect to database.
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    conn = get_db()
     cur = conn.cursor()
 
     if problemid or problemname:
@@ -340,13 +357,13 @@ def get_problem(problemid=None, problemname=None):
 
     # Close database connection.
     cur.close()
-    conn.close()
+    
     return ret
 
 # Returns a ProblemSet object based on setname or None if problem doesn't exist.
 def get_set(setname=None):
     # Connect to database.
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    conn = get_db()
     cur = conn.cursor()
 
     if setname:
@@ -366,7 +383,7 @@ def get_set(setname=None):
 
     # Close database connection.
     cur.close()
-    conn.close()
+    
     return ret
 
 # Returns a Group object based on groupname or None if group doesn't exist.
@@ -378,7 +395,7 @@ def get_group(groupname=None):
 # TODO(junkbot): Apparently this is a bottleneck. FIXME.
 def get_num_attempts(userid, problemid):
     # Connect to database.
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    conn = get_db()
     cur = conn.cursor()
 
     query = ('SELECT COUNT(*) FROM submissions '
@@ -388,7 +405,7 @@ def get_num_attempts(userid, problemid):
 
     # Close database connection.
     cur.close()
-    conn.close()
+    
     return ret
 
 # Returns a Submission object based on username, problename and attempt or None
@@ -399,7 +416,7 @@ def get_submission(username=None, problemname=None, attempt=None):
         attempt = int(attempt)
 
         # Connect to database.
-        conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+        conn = get_db()
         cur = conn.cursor()
 
         user = get_user(username=username)
@@ -427,7 +444,7 @@ def get_submission(username=None, problemname=None, attempt=None):
 
         # Close database connection.
         cur.close()
-        conn.close()
+        
     except ValueError:
         ret = None
     return ret
@@ -440,7 +457,7 @@ def user_search_query(substr):
     space = ' '
 
     # Connect to database.
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    conn = get_db()
     cur = conn.cursor()
 
     query = ('SELECT id FROM competitors '
@@ -454,7 +471,7 @@ def user_search_query(substr):
 
     # Close database connection.
     cur.close()
-    conn.close()
+    
     return ret
 
 # Given a search string, looks for all problems that contain that substring in
@@ -464,7 +481,7 @@ def problem_search_query(substr):
     substr = '%%%s%%' % (substr.lower())
 
     # Connect to database.
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    conn = get_db()
     cur = conn.cursor()
 
     query = ('SELECT id, name, title FROM problems WHERE '
@@ -476,56 +493,83 @@ def problem_search_query(substr):
 
     # Close database connection.
     cur.close()
-    conn.close()
+    
     return ret
 
-# Gets stats for a given problem to display on the problem's page
-def problem_stats(problemid=-1):
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+# Gets some general stats for a given problem to display on the problem's page
+def problem_stats(problemid):
+    conn = get_db()
     cur = conn.cursor()
     stats = OrderedDict()
 
     # Total number of competitors who scored 100
     query = ('SELECT DISTINCT count(competitorid) '
              'FROM submissions '
-             'WHERE problemid = %(problemid)s AND mark = 100;') % {'problemid': problemid}
-    cur.execute(query)
+             'WHERE problemid = %s AND mark = 100;')
+    cur.execute(query, (problemid, ))
     total_solves = cur.fetchone()[0]
-    stats["Total Solves"] = total_solves
+    stats["Total Solves"] = (total_solves,)
 
     # Total Submissions
     query = ('SELECT count(*) '
              'FROM submissions '
-             'WHERE problemid = %(problemid)s;') % {'problemid': problemid}
-    cur.execute(query)
-    stats["Total Submissions"] = cur.fetchone()[0]
+             'WHERE problemid = %s;')
+    cur.execute(query, (problemid, ))
+    stats["Total Submissions"] = cur.fetchone()
 
     # Average Submissions for people who solve the problem
     if total_solves == 0:
-        stats["Average submissions per solve"] = "N/A"
+        stats["Average submissions per solve"] = ("N/A",)
     else:
         query = ('''SELECT count(t1.competitorid)
                     FROM submissions as t1
                     JOIN (
                         SELECT DISTINCT competitorid
                         FROM progress
-                        WHERE problemid = %(problemid)s AND bestscore = 100
+                        WHERE problemid = %s AND bestscore = 100
                     ) as t2
                     ON t1.competitorid = t2.competitorid
-                    WHERE t1.problemid = %(problemid)s;''') % {'problemid': problemid}
-        cur.execute(query)
-        stats["Average submissions per solve"] = cur.fetchone()[0]/total_solves
+                    WHERE t1.problemid = %s;''')
+        cur.execute(query, (problemid, problemid, ))
+        stats["Average submissions per solve"] = (cur.fetchone()[0]/total_solves,)
 
     # How many people have viewed to the problem
     query = ('SELECT DISTINCT count(competitorid) '
              'FROM progress '
-             'WHERE problemid = %(problemid)s;') % {'problemid': problemid}
-    cur.execute(query)
-    stats["Total users who've viewed this problem"] = cur.fetchone()[0]
+             'WHERE problemid = %s;')
+    cur.execute(query, (problemid, ))
+    stats["Total users who've viewed this problem"] = cur.fetchone()
+
     # Close database connection.
     cur.close()
-    conn.close()
+    
     return stats
+
+# Gives the most recent solves for a user
+def recent_solves(userid, max_solves=10):
+    # Connect to database.
+    conn = get_db()
+    cur = conn.cursor()
+    
+    query = ('''SELECT problemid, bestscoreon
+                FROM progress
+                WHERE competitorid = %s and bestscore = 100
+                ORDER BY bestscoreon DESC
+                LIMIT %s;''')
+
+    cur.execute(query, (userid, max_solves, ))
+    solves = cur.fetchall()
+    # Close database connection.
+    cur.close()
+    
+    subs = []
+    for s in solves:
+        subs.append(Submission(problem=get_problem(s[0]), 
+                               timestamp=s[1],
+                               user=get_user(userid=userid)
+                              )
+                   )
+    return subs
 
 # Given a search string, looks for all sets that contain that substring in name
 # or title.
@@ -534,7 +578,7 @@ def set_search_query(substr):
     substr = '%%%s%%' % (substr.lower())
 
     # Connect to database.
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    conn = get_db()
     cur = conn.cursor()
 
     query = ('SELECT name, title, public FROM sets '
@@ -545,14 +589,14 @@ def set_search_query(substr):
 
     # Close database connection.
     cur.close()
-    conn.close()
+    
     return ret
 
 # Given a Problem object, return a list of ProblemSetBrief objects that
 # represent all sets that contain this problem.
 def sets_containing_problem(problem):
     # Connect to database.
-    conn = psycopg2.connect('dbname=%s' % (_DATABASE_NAME))
+    conn = get_db()
     cur = conn.cursor()
 
     query = ('SELECT name, title, public '
@@ -565,7 +609,7 @@ def sets_containing_problem(problem):
 
     # Close database connection.
     cur.close()
-    conn.close()
+    
     return ret
 
 @app.route('/')
@@ -579,8 +623,13 @@ def index():
 def user_page(username):
     user = get_user(username=username)
     if user:
+        # Get recent submissions
         subs = filter_submissions(users=[user.username])
-        return render_template('user_page.html', user=user, subs=subs)
+
+        # Get recent solves
+        solves = recent_solves(user.userid)
+
+        return render_template('user_page.html', user=user, subs=subs, solves=solves)
     else:
         return 'User does not exist'
 
@@ -596,7 +645,13 @@ def problem_page(problemname):
         # Get problem stats
         stats = problem_stats(problem.problemid)
 
-        return render_template('problem_page.html', problem=problem, subs=subs, stats=stats)
+        return render_template(
+                               'problem_page.html', 
+                               problem=problem, 
+                               subs=subs, 
+                               stats=stats.values(),
+                               row_header=stats.keys()
+                              )
     else:
         return 'Problem does not exist'
 
@@ -761,6 +816,7 @@ def search_user():
         users_res=users_res)
 
 # Convert group.GROUPS into GROUPS.
-GROUPS = dict(
-    (key, Group.from_names(name=key, **params)) for (key, params) in
-        groups.GROUPS.iteritems())
+with app.app_context():
+    GROUPS = dict(
+        (key, Group.from_names(name=key, **params)) for (key, params) in
+            groups.GROUPS.iteritems())
