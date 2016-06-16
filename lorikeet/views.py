@@ -531,7 +531,7 @@ def problem_stats(problemid):
                     ON t1.competitorid = t2.competitorid
                     WHERE t1.problemid = %s;''')
         cur.execute(query, (problemid, problemid, ))
-        stats["Average submissions per solve"] = (cur.fetchone()[0]/total_solves,)
+        stats["Average submissions per solve"] = (cur.fetchone()[0]/total_solves, )
 
     # How many people have viewed to the problem
     query = ('SELECT DISTINCT count(competitorid) '
@@ -539,6 +539,13 @@ def problem_stats(problemid):
              'WHERE problemid = %s;')
     cur.execute(query, (problemid, ))
     stats["Total users who've viewed this problem"] = cur.fetchone()
+
+    # Average score per submission
+    query = ('SELECT avg(mark) '
+             'FROM submissions '
+             'WHERE problemid = %s;')
+    cur.execute(query, (problemid, ))
+    stats["Average score per submission"] = (int(cur.fetchone()[0]), )
 
     # Close database connection.
     cur.close()
